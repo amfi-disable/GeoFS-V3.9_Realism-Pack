@@ -2,7 +2,7 @@
 
 ![Version](https://img.shields.io/badge/Version-1.0.0-blue?style=for-the-badge)
 ![Ecosystem](https://img.shields.io/badge/GeoFS-V3.9_Addon--Pack-64c8ff?style=for-the-badge)
-![Status](https://img.shields.io/badge/Status-Stable-green?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-In%20Construction-orange?style=for-the-badge)
 
 The definitive flight physics and environmental realism framework for **GeoFS v3.9**. This pack bridges the gap between browser simulation and high-fidelity flight dynamics by introducing advanced physical effects that react dynamically to your aircraft's state. Fully integrated with the Pro ecosystem for a seamless, immersive experience.
 
