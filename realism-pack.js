@@ -6,8 +6,8 @@
 
         console.log("[GeoFS-V3.9_Realism-Pack] Initializing Advanced Physics Suite...");
 
-        if (!window.registerHUDTab) {
-            console.error("[GeoFS-V3.9_Realism-Pack] Core Library HUD helpers not found!");
+        if (typeof window.registerHUDTab !== 'function') {
+            console.error("[GeoFS-V3.9_Realism-Pack] FATAL: window.registerHUDTab not found! Core Library might be outdated.");
             return;
         }
 
