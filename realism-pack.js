@@ -3,6 +3,9 @@
 
     // Shared HUD Manager
     function ensureSharedHUD() {
+        if (!globalThis.hudProVisible) globalThis.hudProVisible = true;
+        if (globalThis.hudProMinimized === undefined) globalThis.hudProMinimized = false;
+
         if (!document.getElementById('hudMinimizeBtn')) {
             const btn = document.createElement('div');
             btn.id = 'hudMinimizeBtn';
@@ -26,7 +29,7 @@
             panel.innerHTML = `
                 <div id="masterCaution" style="display:none; grid-column: 1 / -1; background: #ef4444; color: #fff; text-align: center; font-weight: 900; padding: 4px; border-radius: 6px; margin-bottom: 8px; animation: cautionPulse 1s infinite; letter-spacing: 2px; font-size: 10px; border: 1px solid #fff;">MASTER CAUTION</div>
                 <div class="hud-drag-handle" style="font-size: 9px; letter-spacing: 2px; color: rgba(100,200,255,0.6);">GEOFS HUD PRO v3.9</div>
-                <div class="unified-tabs" id="hud-unified-tabs"></div>
+                <div class="unified-tabs" id="hud-unified-tabs" style="display: flex; width: 100%;"></div>
             `;
             document.body.appendChild(panel);
             if (window.initAddonDraggable) window.initAddonDraggable(panel, 'geofs-addonpack-hud-pos');
@@ -49,6 +52,27 @@
                 if (btn) btn.innerHTML = '▣';
             };
         }
+
+        // Visibility Controller
+        if (!window._hudVisibilityLoop) {
+            window._hudVisibilityLoop = setInterval(() => {
+                const btn = document.getElementById('hudMinimizeBtn');
+                const panel = document.getElementById('flightDataDisplay');
+                if (!btn || !panel) return;
+
+                const isVisible = globalThis.hudProVisible !== false;
+                const isMinimized = globalThis.hudProMinimized === true;
+                const isPaused = typeof geofs !== 'undefined' && geofs.isPaused && geofs.isPaused();
+
+                btn.style.display = isVisible ? 'flex' : 'none';
+                
+                if (!isVisible || isMinimized || isPaused) {
+                    panel.style.display = 'none';
+                } else {
+                    panel.style.display = 'grid';
+                }
+            }, 100);
+        }
     }
 
     function registerHUDTab(tabId, label, contentHTML, isGrid) {
@@ -59,6 +83,14 @@
             btn.id = `tab-btn-${tabId}`;
             btn.className = 'unified-tab';
             btn.textContent = label;
+            
+            // Tab ordering and sizing
+            const tabOrder = { 'id': 1, 'fuel': 2, 'checks': 3, 'realism': 4 };
+            btn.style.order = tabOrder[tabId] || 99;
+            btn.style.flex = '1';
+            btn.style.padding = '5px 2px';
+            btn.style.fontSize = '10px';
+
             btn.onclick = () => window.switchHUDProTab(tabId);
             tabsContainer.appendChild(btn);
         }
@@ -73,11 +105,13 @@
         }
 
         setTimeout(() => {
-            const firstTab = document.querySelector('#hud-unified-tabs .unified-tab');
+            const tabs = Array.from(document.querySelectorAll('#hud-unified-tabs .unified-tab'));
+            tabs.sort((a, b) => parseInt(a.style.order) - parseInt(b.style.order));
+            const firstTab = tabs[0];
             if (firstTab && !document.querySelector('.unified-tab.active')) {
-                firstTab.click();
+                window.switchHUDProTab(firstTab.id.replace('tab-btn-', ''));
             }
-        }, 100);
+        }, 200);
     }
 
     window.initRealismPackPro = function() {
@@ -86,12 +120,7 @@
         console.log("[GeoFS-V3.9_Realism-Pack] Initializing Advanced Physics Suite...");
 
         window.realismSettings = window.realismSettings || {
-            gBreath: true,
-            cameraShake: true,
-            blackout: true,
-            propwash: true,
-            fbw: true,
-            wingflex: true
+            gBreath: true, cameraShake: true, blackout: true, propwash: true, fbw: true, wingflex: true
         };
         
         window.toggleRealismParam = function(key) {
@@ -148,7 +177,6 @@
                 setInterval(() => {
                     if (!geofs.animation.values) return;
                     const loadFactor = geofs.animation.values.loadFactor ? geofs.animation.values.loadFactor.toFixed(1) : "1.0";
-                    
                     const realismGVal = document.getElementById("realismGVal");
                     const realismGBar = document.getElementById("realismGBar");
                     if (realismGVal) realismGVal.textContent = loadFactor + " G";
@@ -163,8 +191,7 @@
                 setInterval(() => {
                     if (window.realismSettings.gBreath && geofs.animation.values.loadFactor >= 3 && !geofs.isPaused()) {
                         const breath = new Audio("https://raw.githack.com/AwesomeOddEven-NightKeys-LunarBlink/03_GeoFS-V3.9_Addon-Pack/main/Resources/Addons/realism_addon/audio/cutgbreath.mp3");
-                        breath.volume = 0.5;
-                        breath.play();
+                        breath.volume = 0.5; breath.play();
                     }
                 }, 3500);
 
@@ -172,14 +199,9 @@
                 setInterval(() => {
                     if (!window.realismSettings.blackout || !geofs.aircraft.instance) return;
                     const g = geofs.animation.values.loadFactor;
-                    if (g > 9 && geofs.animation.values.view === "cockpit") {
-                        boTimer = Math.min(1, boTimer + 0.01);
-                    } else {
-                        boTimer = Math.max(0, boTimer - 0.005);
-                    }
-                    if (geofs.fx.overg && geofs.fx.overg.shader) {
-                        geofs.fx.overg.shader.uniforms.strength = boTimer;
-                    }
+                    if (g > 9 && geofs.animation.values.view === "cockpit") boTimer = Math.min(1, boTimer + 0.01);
+                    else boTimer = Math.max(0, boTimer - 0.005);
+                    if (geofs.fx.overg && geofs.fx.overg.shader) geofs.fx.overg.shader.uniforms.strength = boTimer;
                 }, 50);
             },
 
