@@ -1,19 +1,117 @@
 (function() {
     'use strict';
 
+    // Shared HUD Manager
+    function ensureSharedHUD() {
+        if (!document.getElementById('hudMinimizeBtn')) {
+            const btn = document.createElement('div');
+            btn.id = 'hudMinimizeBtn';
+            btn.innerHTML = '▣';
+            btn.title = 'Toggle Info Display';
+            btn.style.left = '0px'; 
+            btn.style.top = '50%'; 
+            btn.style.transform = 'translateY(-50%)';
+            btn.onclick = () => {
+                globalThis.hudProMinimized = !globalThis.hudProMinimized;
+                document.getElementById('flightDataDisplay')?.classList.toggle('hud-minimized', globalThis.hudProMinimized);
+                btn.innerHTML = globalThis.hudProMinimized ? '◈' : '▣';
+            };
+            document.body.appendChild(btn);
+            if (window.initAddonDraggable) window.initAddonDraggable(btn, 'geofs-addonpack-hud-icon-pos');
+        }
+
+        if (!document.getElementById('flightDataDisplay')) {
+            const panel = document.createElement('div');
+            panel.id = 'flightDataDisplay';
+            panel.innerHTML = `
+                <div id="masterCaution" style="display:none; grid-column: 1 / -1; background: #ef4444; color: #fff; text-align: center; font-weight: 900; padding: 4px; border-radius: 6px; margin-bottom: 8px; animation: cautionPulse 1s infinite; letter-spacing: 2px; font-size: 10px; border: 1px solid #fff;">MASTER CAUTION</div>
+                <div class="hud-drag-handle" style="font-size: 9px; letter-spacing: 2px; color: rgba(100,200,255,0.6);">GEOFS HUD PRO v3.9</div>
+                <div class="unified-tabs" id="hud-unified-tabs"></div>
+            `;
+            document.body.appendChild(panel);
+            if (window.initAddonDraggable) window.initAddonDraggable(panel, 'geofs-addonpack-hud-pos');
+        }
+
+        if (!window.switchHUDProTab) {
+            window.switchHUDProTab = function(activeTabId) {
+                globalThis.activeHudProTab = activeTabId;
+                document.querySelectorAll('#flightDataDisplay .unified-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('#flightDataDisplay .unified-content').forEach(c => c.classList.remove('active'));
+                
+                const tabBtn = document.getElementById(`tab-btn-${activeTabId}`);
+                const tabContent = document.getElementById(`tab-content-${activeTabId}`);
+                if (tabBtn) tabBtn.classList.add('active');
+                if (tabContent) tabContent.classList.add('active');
+                
+                globalThis.hudProMinimized = false;
+                document.getElementById('flightDataDisplay')?.classList.remove('hud-minimized');
+                const btn = document.getElementById('hudMinimizeBtn');
+                if (btn) btn.innerHTML = '▣';
+            };
+        }
+    }
+
+    function registerHUDTab(tabId, label, contentHTML, isGrid) {
+        ensureSharedHUD();
+        const tabsContainer = document.getElementById('hud-unified-tabs');
+        if (!document.getElementById(`tab-btn-${tabId}`)) {
+            const btn = document.createElement('button');
+            btn.id = `tab-btn-${tabId}`;
+            btn.className = 'unified-tab';
+            btn.textContent = label;
+            btn.onclick = () => window.switchHUDProTab(tabId);
+            tabsContainer.appendChild(btn);
+        }
+
+        const panel = document.getElementById('flightDataDisplay');
+        if (!document.getElementById(`tab-content-${tabId}`)) {
+            const content = document.createElement('div');
+            content.id = `tab-content-${tabId}`;
+            content.className = `unified-content ${isGrid ? 'unified-grid' : ''}`;
+            content.innerHTML = contentHTML;
+            panel.appendChild(content);
+        }
+
+        setTimeout(() => {
+            const firstTab = document.querySelector('#hud-unified-tabs .unified-tab');
+            if (firstTab && !document.querySelector('.unified-tab.active')) {
+                firstTab.click();
+            }
+        }, 100);
+    }
+
     window.initRealismPackPro = function() {
         if (window.realismPackPro) return;
 
         console.log("[GeoFS-V3.9_Realism-Pack] Initializing Advanced Physics Suite...");
 
-        // Default settings - respect HUD Pro if already defined
         window.realismSettings = window.realismSettings || {
             gBreath: true,
             cameraShake: true,
             blackout: true,
             propwash: true,
+            fbw: true,
             wingflex: true
         };
+        
+        window.toggleRealismParam = function(key) {
+            window.realismSettings[key] = !window.realismSettings[key];
+            const tgl = document.getElementById(`toggle_${key}`);
+            if (tgl) {
+                tgl.style.background = window.realismSettings[key] ? '#3b82f6' : 'rgba(255,255,255,0.1)';
+                tgl.firstElementChild.style.left = window.realismSettings[key] ? '20px' : '2px';
+            }
+        };
+
+        function makeToggle(label, key) {
+            return `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 4px 0;">
+                    <span style="font-size: 0.85rem; color: rgba(255,255,255,0.9);">${label}</span>
+                    <div onclick="window.toggleRealismParam('${key}')" id="toggle_${key}" style="width: 36px; height: 18px; background: ${window.realismSettings[key] ? '#3b82f6' : 'rgba(255,255,255,0.1)'}; border-radius: 9px; cursor: pointer; position: relative; transition: all 0.3s;">
+                        <div style="width: 14px; height: 14px; background: #fff; border-radius: 50%; position: absolute; top: 2px; left: ${window.realismSettings[key] ? '20px' : '2px'}; transition: all 0.3s;"></div>
+                    </div>
+                </div>`;
+        }
 
         const suite = {
             init: function() {
@@ -25,60 +123,43 @@
             },
 
             initDashboard: function() {
-                // Only create the standalone dashboard if the HUD Pro isn't already handling the UI
-                if (document.getElementById("realismCard") || document.getElementById("hud-pro-main-container")) {
-                    console.log("[GeoFS-V3.9_Realism-Pack] External UI detected (HUD Pro). Skipping standalone dashboard.");
-                    return;
-                }
-                
-                console.log("[GeoFS-V3.9_Realism-Pack] Building standalone physics dashboard.");
-                const card = document.createElement("div");
-                card.id = "realismCard";
-                card.className = "addonpack-card";
-                card.innerHTML = `
-                    <div class="addonpack-card-header">
-                        <span>💎 GeoFS-V3.9_Realism-Pack</span>
-                        <button class="close-btn" onclick="document.getElementById('realismCard').classList.remove('active')">✕</button>
-                    </div>
-                    <div class="addonpack-card-content">
-                        ${this.createToggle("G-Breathing", "gBreath")}
-                        ${this.createToggle("Camera Shake", "cameraShake")}
-                        ${this.createToggle("G-Blackout", "blackout")}
-                        ${this.createToggle("Propwash", "propwash")}
-                        <div style="margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">
-                            <div style="display: flex; justify-content: space-between;">
-                                <span style="font-size: 10px; color: #888;">Load Factor</span>
-                                <span id="phys-g-val" style="font-size: 12px; font-weight: bold; color: #10b981;">1.0 G</span>
+                const realismHTML = `
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        ${makeToggle("G-Breathing & Sounds", "gBreath")}
+                        ${makeToggle("Dynamic Camera Shake", "cameraShake")}
+                        ${makeToggle("High-G Blackout", "blackout")}
+                        ${makeToggle("Engine Propwash", "propwash")}
+                        ${makeToggle("Fly-By-Wire (Jets)", "fbw")}
+                        ${makeToggle("Advanced Wingflex", "wingflex")}
+                        <div style="margin-top: 10px; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <span class="stat-label">Current Load</span>
+                                <span id="realismGVal" class="stat-value highlight" style="font-size: 1.1rem;">1.0 G</span>
+                            </div>
+                            <div style="width: 100%; height: 4px; background: rgba(0,0,0,0.3); border-radius: 2px; overflow: hidden;">
+                                <div id="realismGBar" style="width: 10%; height: 100%; background: #3b82f6; transition: width 0.1s linear;"></div>
                             </div>
                         </div>
                     </div>
                 `;
-                document.body.appendChild(card);
-                if (window.initAddonDraggable) window.initAddonDraggable(card);
+                
+                registerHUDTab('realism', 'REALISM', realismHTML, false);
 
                 setInterval(() => {
                     if (!geofs.animation.values) return;
-                    const g = geofs.animation.values.loadFactor || 1;
-                    const el = document.getElementById("phys-g-val");
-                    if (el) {
-                        el.textContent = g.toFixed(1) + " G";
-                        el.style.color = g > 6 ? "#ef4444" : (g > 4 ? "#f59e0b" : "#10b981");
+                    const loadFactor = geofs.animation.values.loadFactor ? geofs.animation.values.loadFactor.toFixed(1) : "1.0";
+                    
+                    const realismGVal = document.getElementById("realismGVal");
+                    const realismGBar = document.getElementById("realismGBar");
+                    if (realismGVal) realismGVal.textContent = loadFactor + " G";
+                    if (realismGBar) {
+                        const gRatio = Math.min(100, (parseFloat(loadFactor) / 9) * 100);
+                        realismGBar.style.width = gRatio + "%";
                     }
-                }, 200);
-            },
-
-            createToggle: function(label, key) {
-                return `
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <span style="font-size: 12px;">${label}</span>
-                        <input type="checkbox" ${window.realismSettings[key] ? 'checked' : ''} onclick="window.realismSettings['${key}'] = this.checked">
-                    </div>
-                `;
+                }, 100);
             },
 
             initGSystems: function() {
-                console.log("[GeoFS-V3.9_Realism-Pack] G-Systems (Audio/Blackout) monitoring active.");
-                // G-Breathing Audio
                 setInterval(() => {
                     if (window.realismSettings.gBreath && geofs.animation.values.loadFactor >= 3 && !geofs.isPaused()) {
                         const breath = new Audio("https://raw.githack.com/AwesomeOddEven-NightKeys-LunarBlink/03_GeoFS-V3.9_Addon-Pack/main/Resources/Addons/realism_addon/audio/cutgbreath.mp3");
@@ -87,7 +168,6 @@
                     }
                 }, 3500);
 
-                // Blackout Shader Logic (Simplified)
                 let boTimer = 0;
                 setInterval(() => {
                     if (!window.realismSettings.blackout || !geofs.aircraft.instance) return;
@@ -104,8 +184,6 @@
             },
 
             initCameraSystems: function() {
-                console.log("[GeoFS-V3.9_Realism-Pack] Camera dynamics monitoring active.");
-                // Camera Shake
                 setInterval(() => {
                     if (window.realismSettings.cameraShake && geofs.animation.values.aoa >= 10 && !geofs.isPaused()) {
                         const s = 0.0001 * geofs.animation.values.aoa * Math.random();
@@ -116,8 +194,7 @@
             },
 
             initPropwash: function() {
-                console.log("[GeoFS-V3.9_Realism-Pack] Propwash calculation loop active.");
-                const PWAircraft = new Set([1022, 1026, 14, 16, 2, 8, 13]); // Simplified list
+                const PWAircraft = new Set([1022, 1026, 14, 16, 2, 8, 13]);
                 setInterval(() => {
                     if (!window.realismSettings.propwash || !geofs.aircraft.instance) return;
                     if (PWAircraft.has(Number(geofs.aircraft.instance.id))) {
