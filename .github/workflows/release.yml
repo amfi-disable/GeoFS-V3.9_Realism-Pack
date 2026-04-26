@@ -15,5 +15,6 @@ jobs:
         with:
           generate_release_notes: true
           files: |
-            standalone.user.js
-            src/physics.js
+            *.user.js
+            *.js
+            src/*.js
