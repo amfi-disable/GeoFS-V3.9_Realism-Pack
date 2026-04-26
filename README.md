@@ -19,7 +19,7 @@ The definitive flight physics and environmental realism framework for **GeoFS v3
 ### Standalone (Tampermonkey)
 1. Install the [Tampermonkey](https://www.tampermonkey.net/) extension.
 2. Click **Create a new script**.
-3. Paste the contents of `standalone.user.js` from this repository.
+3. Paste the contents of `realism-pack_standalone.user.js` from this repository.
 4. Save and launch GeoFS.
 
 ## 🔗 Ecosystem Dependencies
