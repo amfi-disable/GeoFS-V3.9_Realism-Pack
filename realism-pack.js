@@ -82,7 +82,7 @@
             initGSystems: function() {
                 setInterval(() => {
                     if (window.realismSettings.gBreath && geofs.animation.values.loadFactor >= 3 && !geofs.isPaused()) {
-                        const breath = new Audio("https://raw.githack.com/AwesomeOddEven-NightKeys-LunarBlink/03_GeoFS-V3.9_Addon-Pack/main/Resources/Addons/realism_addon/audio/cutgbreath.mp3");
+                        const breath = new Audio("https://raw.githack.com/AwesomeOddEven-NightKeys-LunarBlink/GeoFS-V3.9_Realism-Pack/main/audio/cutgbreath.mp3");
                         breath.volume = 0.5; breath.play();
                     }
                 }, 3500);
