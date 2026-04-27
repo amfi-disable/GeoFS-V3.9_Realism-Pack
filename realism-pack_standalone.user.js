@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GeoFS-V3.9_Realism-Pack
 // @namespace    http://tampermonkey.net/
-// @version      1.0.0-Alpha
+// @version      1.0.0
 // @description  Advanced flight physics and environmental effects for GeoFS.
 // @author       AwesomeOddEven-NightKeys-LunarBlink
 // @match        https://www.geo-fs.com/geofs.php*
