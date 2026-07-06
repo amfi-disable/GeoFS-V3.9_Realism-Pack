@@ -123,6 +123,8 @@
 // @match               https://www.geo-fs.com/geofs.php*
 // @grant               none
 // @license             MIT
+// @downloadURL https://update.greasyfork.org/scripts/581519/GeoFS-V39_Realism-Pack.user.js
+// @updateURL https://update.greasyfork.org/scripts/581519/GeoFS-V39_Realism-Pack.meta.js
 // ==/UserScript==
 
 (function() {
