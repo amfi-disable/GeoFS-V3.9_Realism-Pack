@@ -1,36 +1,25 @@
 # GeoFS-V3.9_Realism-Pack
 
-![Version](https://img.shields.io/badge/Version-1.0.0-blue?style=for-the-badge)
-![Ecosystem](https://img.shields.io/badge/GeoFS-V3.9_Addon--Pack-64c8ff?style=for-the-badge)
-![Status](https://img.shields.io/badge/Status-In%20Construction-orange?style=for-the-badge)
+![Version](https://img.shields.io/badge/Version-v2.0.1-3b82f6?style=flat-square&logo=git&logoColor=white)
+![Ecosystem](https://img.shields.io/badge/GeoFS--V3.9-Realism_Pack-06b6d4?style=flat-square&logo=box&logoColor=white)
+![Status](https://img.shields.io/badge/Status-Stable-10b981?style=flat-square&logo=lighthouse&logoColor=white)
 
-The definitive flight physics and environmental realism framework for **GeoFS v3.9**. This pack bridges the gap between browser simulation and high-fidelity flight dynamics by introducing advanced physical effects that react dynamically to your aircraft's state. Fully integrated with the Pro ecosystem for a seamless, immersive experience.
+The immersion-focused environmental physics framework for **GeoFS-V3.9**. This module introduces advanced atmospheric effects, ground handling physics, and sound synthesis to bridge the gap between simulation and reality.
 
 ## ✨ Features
 
-- **🫁 G-Breathing & Sounds**: High-fidelity audio-visual feedback for high-G maneuvers, featuring immersive breathing sounds and grayout/blackout shader effects.
-- **🎨 Dynamic Camera Shake**: Real-time camera vibrations based on Angle of Attack (AOA) and airspeed, simulating airframe stress and aerodynamic buffet.
-- **💨 Engine Propwash**: Physics-based airflow simulation for propeller aircraft, dynamically affecting control surface effectiveness and handling.
-- **🧩 HUD Pro Integration**: Fully controllable via the dedicated **[REALISM]** tab of the [HUD Information Display Pro](https://github.com/AwesomeOddEven-NightKeys-LunarBlink/GeoFS-V3.9_HUD-Information-Display-Pro).
-- **🛡️ SafeInit Architecture**: Built on the V3.9 Core Library to ensure 100% stability and perfect synchronization with all other "Pro" suite modules.
+- **🌬️ Advanced Turbulence**: Procedural wind-shear and gust simulation based on altitude and terrain.
+- **🛞 Ground Physics**: Enhanced friction models for diverse surface types (Grass, Dirt, Tarmac).
+- **🔊 Sonic Synthesis**: Real-time sound layering for wind-whistle, airframe stress, and engine resonance.
+- **🌅 Visual Post-FX**: Integrated cinematic color grading and atmospheric haze controls.
+- **🚀 CDN Loader Architecture**: Instant updates via a lightweight loader pattern, ensuring you always have the latest realism features.
 
 ## 🛠️ Installation
 
 ### Standalone (Tampermonkey)
+
 1. Install the [Tampermonkey](https://www.tampermonkey.net/) extension.
-2. Click **Create a new script**.
-3. Paste the contents of `realism-pack_standalone.user.js` from this repository.
-4. Save and launch GeoFS.
+2. Install the script via [**Greasy Fork**](https://greasyfork.org/en/scripts/581519-geofs-v3-9-realism-pack).
+3. Refresh GeoFS and the realism engine will automatically initialize alongside the HUD.
 
-## 🔗 Ecosystem Dependencies
-This module is part of the **GeoFS-V3.9 Addon-Pack** ecosystem and requires:
-- [GeoFS-V3.9_Core-Library](https://github.com/AwesomeOddEven-NightKeys-LunarBlink/GeoFS-V3.9_Core-Library)
-- [GeoFS-V3.9_Design-System](https://github.com/AwesomeOddEven-NightKeys-LunarBlink/GeoFS-V3.9_Design-System)
-
-## 🤝 Credits
-- **AwesomeOddEven** (Physics Logic & Ecosystem Architecture)
-- **NightKeys** (Audio Engineering & Quality Assurance)
-- **LunarBlink** (Shader Development & Visual Synthesis)
-
----
-*© 2026 AwesomeOddEven-NightKeys-LunarBlink. Part of the GeoFS-V3.9 Pro Suite.*
+*© 2026 _init. Part of the [GeoFS-V3.9_Ecosystem](https://sites.google.com/view/geofs-v39-ecosystem/home).*
