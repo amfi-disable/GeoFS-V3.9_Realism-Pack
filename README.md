@@ -12,7 +12,7 @@ The immersion-focused environmental physics framework for **GeoFS-V3.9**. This m
 - **🛞 Ground Physics**: Enhanced friction models for diverse surface types (Grass, Dirt, Tarmac).
 - **🔊 Sonic Synthesis**: Real-time sound layering for wind-whistle, airframe stress, and engine resonance.
 - **🌅 Visual Post-FX**: Integrated cinematic color grading and atmospheric haze controls.
-- **🚀 CDN Loader Architecture**: Instant updates via a lightweight loader pattern, ensuring you always have the latest realism features.
+- **🚀 CDN Loader Architecture**: Automatically loads realism enhancements alongside the active aircraft.
 
 ## 🛠️ Installation
 
@@ -20,6 +20,6 @@ The immersion-focused environmental physics framework for **GeoFS-V3.9**. This m
 
 1. Install the [Tampermonkey](https://www.tampermonkey.net/) extension.
 2. Install the script via [**Greasy Fork**](https://greasyfork.org/en/scripts/581519-geofs-v3-9-realism-pack).
-3. Refresh GeoFS and the realism engine will automatically initialize alongside the HUD.
+3. Refresh GeoFS and the module will automatically initialize alongside the HUD.
 
 *© 2026 _init. Part of the [GeoFS-V3.9_Ecosystem](https://sites.google.com/view/geofs-v39-ecosystem/home).*
